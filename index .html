@@ -536,54 +536,6 @@ form.addEventListener('submit', (e) => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 </script>
-const form = document.getElementById('surveyForm');
-const success = document.getElementById('success');
 
-// URL вашего веб-приложения Google Apps Script
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxhBob1yuW3gTMK9w0dUQWdWgzYsFxxXZ64mhBhy4JlZeD2Ds2Il3y-lIhTP_xN4pWw/exec';
-
-// Ограничение "до 3 вариантов" для вопроса 4
-document.querySelectorAll('input[name="q4"]').forEach(cb => {
-  cb.addEventListener('change', () => {
-    const checked = document.querySelectorAll('input[name="q4"]:checked');
-    if (checked.length > 3) {
-      cb.checked = false;
-      cb.parentElement.style.borderColor = '#b94a4a';
-      setTimeout(() => cb.parentElement.style.borderColor = '', 600);
-    }
-  });
-});
-
-// Отправка формы
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  // Собираем данные формы
-  const fd = new FormData(form);
-  const urlParams = new URLSearchParams(fd);
-
-  try {
-    const response = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      body: urlParams,
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    });
-
-    const result = await response.json();
-
-    if (result.result === 'success') {
-      // Скрываем форму, показываем успех
-      form.style.display = 'none';
-      success.classList.add('show');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      alert('Произошла ошибка при отправке. Попробуйте ещё раз.');
-      console.error('Ошибка сервера:', result.error);
-    }
-  } catch (error) {
-    alert('Ошибка сети. Проверьте подключение к интернету.');
-    console.error('Ошибка:', error);
-  }
-});
 </body>
 </html>
