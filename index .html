@@ -499,6 +499,57 @@ footer{
 const form = document.getElementById('surveyForm');
 const success = document.getElementById('success');
 
+// ⚠️ ВСТАВЬТЕ СЮДА URL ВАШЕГО ВЕБ-ПРИЛОЖЕНИЯ ИЗ GOOGLE APPS SCRIPT
+const scriptURL = 'https://script.google.com/macros/s/AKfycbwrdRDvL4ghgkvsKTwelK80CyRn3msWxtZEzVSnR01ZxyG9BHCf6JplZx4MHIPj0YA/exec'; 
+
+// Ограничение "до 3 вариантов" для вопроса 4
+document.querySelectorAll('input[name="q4"]').forEach(cb => {
+  cb.addEventListener('change', () => {
+    const checked = document.querySelectorAll('input[name="q4"]:checked');
+    if (checked.length > 3) {
+      cb.checked = false;
+      cb.parentElement.style.borderColor = '#b94a4a';
+      setTimeout(() => cb.parentElement.style.borderColor = '', 600);
+    }
+  });
+});
+
+// Обработка отправки формы
+form.addEventListener('submit', (e) => {
+  e.preventDefault(); // Предотвращаем стандартную отправку формы
+
+  const formData = new FormData(form);
+
+  // Отправляем данные в Google Apps Script
+  fetch(scriptURL, { 
+    method: 'POST', 
+    body: formData 
+  })
+  .then(response => {
+    // Если ответ не OK, выбрасываем ошибку
+    if (!response.ok) {
+      throw new Error(`Ошибка HTTP: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.result === 'success') {
+      // Скрываем форму, показываем сообщение об успехе
+      form.style.display = 'none';
+      success.classList.add('show');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      console.log('Ответы успешно отправлены! Номер строки:', data.row);
+    } else {
+      throw new Error('Скрипт вернул ошибку: ' + (data.error || 'неизвестная ошибка'));
+    }
+  })
+  .catch(error => {
+    console.error('Ошибка при отправке:', error);
+    alert('Произошла ошибка при отправке ответов. Пожалуйста, попробуйте еще раз.');
+  });
+});
+</script>
+
 // Ограничение "до 3 вариантов" для вопроса 4
 document.querySelectorAll('input[name="q4"]').forEach(cb => {
   cb.addEventListener('change', () => {
